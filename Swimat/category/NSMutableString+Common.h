@@ -1,20 +1,22 @@
 #import <Foundation/Foundation.h>
 
-@interface NSMutableString(Common)
+@interface NSMutableString (Common)
 
 /**
- @brief remove trailing space and add string with space
+   @brief remove trailing space and add string with space
  */
--(void) spaceWith:(NSString *)string;
+- (void)spaceWith:(NSString *)string;
 
 /**
- @brief keep one space at trailing
+   @brief keep one space at trailing
  */
--(void) keepSpace;
+- (void)keepSpace;
+
+- (void)keepNewline;
 
 /**
- @brief remove trailing space
+   @brief remove trailing space
  */
--(void) trim;
+- (void)trim;
 
 @end
