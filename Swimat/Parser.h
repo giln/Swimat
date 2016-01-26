@@ -3,15 +3,14 @@
 @interface Parser : NSObject
 
 {
-    @public
-    int indent;
-    int onetimeIndent;
-    int currentIndent;
-    NSMutableString *retString;
-    NSString *orString;
-    NSRange newRange;
-    NSUInteger strIndex;
-    NSString *indentString;
+@public
+	int indent;
+	int onetimeIndent;
+	NSMutableString *retString;
+	NSString *orString;
+	NSRange newRange;
+	NSUInteger strIndex;
+	NSString *indentString;
 }
 
 + (bool)isSpace:(unichar)c;
@@ -49,6 +48,12 @@
 
 - (bool)isNextString:(NSString *)check;
 
-- (NSUInteger)addToEnd:(NSString *)string edit:(NSMutableString *)editString withIndex:(NSUInteger)index;
+-(bool) isNextLineEmpty:(NSUInteger)index;
+
+-(bool) isNextLineLowerBrackets:(NSUInteger)index;
+
+-(bool) isEmptyLine;
+
+-(NSUInteger) addToEnd:(NSString *) string edit:(NSMutableString *) editString withIndex:(NSUInteger) index;
 
 @end

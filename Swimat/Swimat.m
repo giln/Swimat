@@ -27,69 +27,97 @@
     return self;
 }
 
-- (void)didApplicationFinishLaunchingNotification:(NSNotification *)noti {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidFinishLaunchingNotification object:nil];
-
-    NSMenuItem *editItem = [[NSApp mainMenu] itemWithTitle:@"Edit"];
-    if (editItem) {
-        [[editItem submenu] addItem:[NSMenuItem separatorItem]];
-
-        NSMenu *swimatMenu = [[NSMenu alloc] initWithTitle:@"Swimat"];
-        NSMenuItem *swimatItem = [[NSMenuItem alloc] initWithTitle:@"Swimat" action:nil keyEquivalent:@""];
-        [swimatItem setSubmenu:swimatMenu];
-        [[editItem submenu] addItem:swimatItem];
-
-        NSMenuItem *formatItem = [[NSMenuItem alloc] initWithTitle:@"Format" action:@selector(formatString) keyEquivalent:@"l"];
-        [formatItem setKeyEquivalentModifierMask:NSAlphaShiftKeyMask | NSCommandKeyMask | NSAlternateKeyMask];
-        [formatItem setTarget:[Swimat class]];
-        [swimatMenu addItem:formatItem];
-
-        [swimatMenu addItem:[NSMenuItem separatorItem]];
-
-        NSString *indent_type = [Prefs getIndent];
-        for (NSString *title in [Prefs getIndentArray]) {
-            NSMenuItem *indentItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(updateIndent:) keyEquivalent:@""];
-            [indentItem setTarget:[Swimat class]];
-            if ([indentItem.title isEqualToString:indent_type]) {
-                indentItem.state = NSOnState;
-            }
-            [swimatMenu addItem:indentItem];
-        }
-
-        [swimatMenu addItem:[NSMenuItem separatorItem]];
-        NSMenuItem *autoItem = [[NSMenuItem alloc] initWithTitle:@"Auto Format before Save" action:@selector(updateAutoFormat:) keyEquivalent:@""];
-        [autoItem setTarget:[Swimat class]];
-        if ([Prefs isAutoFormat]) {
-            autoItem.state = NSOnState;
-        } else {
-            autoItem.state = NSOffState;
-        }
-        [swimatMenu addItem:autoItem];
-
+- (void)didApplicationFinishLaunchingNotification:(NSNotification*)noti {
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidFinishLaunchingNotification object:nil];
+	
+	NSMenuItem *editItem = [[NSApp mainMenu] itemWithTitle:@"Edit"];
+	if (editItem) {
+		[[editItem submenu] addItem:[NSMenuItem separatorItem]];
+		
+		NSMenu *swimatMenu = [[NSMenu alloc] initWithTitle:@"Swimat"];
+		NSMenuItem *swimatItem = [[NSMenuItem alloc] initWithTitle:@"Swimat" action:nil keyEquivalent:@""];
+		[swimatItem setSubmenu:swimatMenu];
+		[[editItem submenu] addItem:swimatItem];
+		
+		NSMenuItem *formatItem = [[NSMenuItem alloc] initWithTitle:@"Format" action:@selector(formatString) keyEquivalent:@"l"];
+		[formatItem setKeyEquivalentModifierMask:NSAlphaShiftKeyMask | NSCommandKeyMask | NSAlternateKeyMask];
+		[formatItem setTarget:[Swimat class]];
+		[swimatMenu addItem:formatItem];
+		
+		[swimatMenu addItem:[NSMenuItem separatorItem]];
+		
+		NSString *indent_type = [Prefs getIndent];
+		for (NSString *title in [Prefs getIndentArray]) {
+			NSMenuItem *indentItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(updateIndent:) keyEquivalent:@""];
+			[indentItem setTarget:[Swimat class]];
+			if ([indentItem.title isEqualToString:indent_type]) {
+				indentItem.state = NSOnState;
+			}
+			[swimatMenu addItem:indentItem];
+		}
+		
+		[swimatMenu addItem:[NSMenuItem separatorItem]];
+		NSMenuItem *autoItem = [[NSMenuItem alloc] initWithTitle:@"Auto Format before Save" action:@selector(updateAutoFormat:) keyEquivalent:@""];
+		[autoItem setTarget:[Swimat class]];
+		if ([Prefs isAutoFormat]) {
+			autoItem.state = NSOnState;
+		} else {
+			autoItem.state = NSOffState;
+		}
+		[swimatMenu addItem:autoItem];
+		NSMenuItem *buildItem = [[NSMenuItem alloc] initWithTitle:@"Format when Build" action:@selector(updateFormatOnBuild:) keyEquivalent:@""];
+		[buildItem setTarget:[Swimat class]];
+		if ([Prefs isFormatOnBuild]) {
+			buildItem.state = NSOnState;
+		} else {
+			buildItem.state = NSOffState;
+		}
+		[swimatMenu addItem:buildItem];
+		
+		[swimatMenu addItem:[NSMenuItem separatorItem]];
+		NSMenuItem *indentEmptyLineItem = [[NSMenuItem alloc] initWithTitle:@"Indent Empty Line" action:@selector(indentEmptyLine:) keyEquivalent:@""];
+		[indentEmptyLineItem setTarget:[Swimat class]];
+		if ([Prefs isIndentEmptyLine]) {
+			indentEmptyLineItem.state = NSOnState;
+		} else {
+			indentEmptyLineItem.state = NSOffState;
+		}
+		[swimatMenu addItem:indentEmptyLineItem];
+        
         [swimatMenu addItem:[NSMenuItem separatorItem]];
         NSMenuItem *allmanItem = [[NSMenuItem alloc] initWithTitle:@"Allman Style" action:@selector(updateAllman:) keyEquivalent:@""];
         [allmanItem setTarget:[Swimat class]];
-
+        
         if ([Prefs isAllman]) {
             allmanItem.state = NSOnState;
         } else {
             allmanItem.state = NSOffState;
         }
-
+        
         [swimatMenu addItem:allmanItem];
-    }
+	}
 }
 
 + (void)updateAllman:(NSMenuItem *)menuItem {
     bool allman = ![Prefs isAllman];
-
+    
     [Prefs setAllman:allman];
-
+    
     if (allman) {
         menuItem.state = NSOnState;
     } else {
         menuItem.state = NSOffState;
     }
+}
+
++ (void)indentEmptyLine:(NSMenuItem *)menuItem {
+	bool indentEmptyLine = ![Prefs isIndentEmptyLine];
+	[Prefs setIndentEmptyLine:indentEmptyLine];
+	if (indentEmptyLine) {
+		menuItem.state = NSOnState;
+	} else {
+		menuItem.state = NSOffState;
+	}
 }
 
 + (void)updateAutoFormat:(NSMenuItem *)menuItem {
@@ -100,6 +128,16 @@
     } else {
         menuItem.state = NSOffState;
     }
+}
+
++ (void)updateFormatOnBuild:(NSMenuItem *)menuItem {
+	bool formatOnBuild = ![Prefs isFormatOnBuild];
+	[Prefs setFormatOnBuild:formatOnBuild];
+	if (formatOnBuild) {
+		menuItem.state = NSOnState;
+	} else {
+		menuItem.state = NSOffState;
+	}
 }
 
 + (void)updateIndent:(NSMenuItem *)menuItem {

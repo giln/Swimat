@@ -107,15 +107,12 @@
     return -1;
 }
 
+-(void) trimWithIndent {
+	[retString trim];
+	if (retString.length > 0 && [retString characterAtIndex:retString.length - 1] == '\n') {
+		[self addIndent:retString withCount:indent];
+	}
 
-- (void)trimWithIndent
-{
-    [retString trim];
-
-    if (retString.length > 0 && [retString characterAtIndex:retString.length - 1] == '\n')
-    {
-        [self addIndent:retString withCount:currentIndent];
-    }
 }
 
 
@@ -147,23 +144,34 @@
 }
 
 
-- (NSUInteger)addToEnd:(NSString *)string edit:(NSMutableString *)editString withIndex:(NSUInteger)index
-{
-    NSUInteger nextIndex = [string nextIndex:index search:@"\n" defaults:-1];
+-(bool) isNextLineEmpty:(NSUInteger)index {
+	NSUInteger nextNonSpaceIndex = [orString nextNonSpaceIndex:index defaults:retString.length];
+	return nextNonSpaceIndex < orString.length ? [orString characterAtIndex:nextNonSpaceIndex] == '\n' : false;
+}
 
-    if (nextIndex == -1)       // not found '\n'
-    {
-        [editString appendString:[string substringFromIndex:index]];
-        [editString trim];
-        return string.length;
-    }
-    else
-    {
-        [editString appendString:[string substringWithRange:NSMakeRange(index, nextIndex - index - 1)]];
-        [editString trim];
-        [editString appendString:@"\n"];
-        return nextIndex;
-    }
+-(bool) isNextLineLowerBrackets:(NSUInteger)index {
+	NSUInteger nextNonSpaceIndex = [orString nextNonSpaceIndex:index defaults:retString.length];
+	return nextNonSpaceIndex < orString.length ? [Parser isLowerBrackets:[orString characterAtIndex:nextNonSpaceIndex]] : false;
+}
+
+-(bool) isEmptyLine {
+	NSUInteger lastNonSpaceIndex = [retString lastNonSpaceIndex:retString.length - 1 defaults:retString.length];
+	return lastNonSpaceIndex < retString.length ? [retString characterAtIndex:lastNonSpaceIndex] == '\n' : false;
+}
+
+-(NSUInteger) addToEnd:(NSString *) string edit:(NSMutableString *) editString withIndex:(NSUInteger) index {
+	NSUInteger nextIndex = [string nextIndex:index search:@"\n" defaults:-1];
+	if (nextIndex == -1) { // not found '\n'
+		[editString appendString:[string substringFromIndex:index]];
+		[editString trim];
+		return string.length;
+	} else {
+		[editString appendString:[string substringWithRange:NSMakeRange(index, nextIndex - index - 1)]];
+		[editString trim];
+		[editString appendString:@"\n"];
+		return nextIndex;
+	}
+
 }
 
 
