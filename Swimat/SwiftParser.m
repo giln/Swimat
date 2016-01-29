@@ -429,7 +429,10 @@ bool indentEmptyLine;
 			if (c == '(') {
 				[self trimWithIndent];
 			} else {
-				[retString keepSpace];
+				[retString keepNewline];
+                indent--;
+                [self trimWithIndent];
+                indent++;
 			}
 		} else {
 			switch (c) {
