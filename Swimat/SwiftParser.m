@@ -429,10 +429,14 @@ bool indentEmptyLine;
 			if (c == '(') {
 				[self trimWithIndent];
 			} else {
+                if ([Prefs isAllman]) {
 				[retString keepNewline];
                 indent--;
                 [self trimWithIndent];
                 indent++;
+                } else {
+                    [retString keepSpace];
+                }
 			}
 		} else {
 			switch (c) {
